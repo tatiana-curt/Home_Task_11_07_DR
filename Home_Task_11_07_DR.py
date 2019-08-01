@@ -65,16 +65,28 @@ def get_top_3_avatars(vk, info):
 
 def write_to_bd():
     import Write_to_BD
+    import sqlalchemy.exc
+
     Write_to_BD.create_all()
-    Write_to_BD.add_persons()
+
+    try:
+        Write_to_BD.add_persons()
+    except sqlalchemy.exc.IntegrityError as e:
+        print('Данные уже записны')
+        drop = input('Для удалния данных введите команду "d": ')
+        if drop == 'd':
+            Write_to_BD.drop_all()
+            print('Данные удалены. Перезапустите программу')
+        else:
+            return 'Перезапустите программу'
 
 
 def main():
-    user_input_login = input('Для доступа к программе введите свой логин и пароль или q для выхода.\nЛогин (или номер телефона: ')
+    user_input_login = input('Для доступа к программе введите свой логин и пароль.\nЛогин (или номер телефона): ')
     user_input_password = input('Пароль: ')
     scope = 'photos,groups'
     vk_session = vk_api.VkApi(login=user_input_login, password=user_input_password, api_version='5.101', scope=scope)
-    # vk_session = vk_api.VkApi(login='Добавить свой логин', password='Добавить свой пароль', api_version='5.101', scope='photos,groups')
+    # vk_session = vk_api.VkApi(login='', password='', api_version='5.101', scope='photos,groups')
 
     try:
         vk_session.auth(token_only=True)
@@ -89,6 +101,7 @@ def main():
         json.dump(get_top_3_avatars(vk, pretender_list), file, ensure_ascii=False, indent=2) # Записываем результат в Json (пункт 5 доработки)
 
     write_to_bd() # Записываем результат в БД
+
 
 if __name__ == '__main__':
     main()

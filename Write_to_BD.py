@@ -33,8 +33,8 @@ class VKinder(Base):
     id_name = Column(Integer, nullable=False, unique=True)
     photos = Column(JSONB, server_default='[]', default=list, nullable=False)
 
-# def drop_all():
-#     Base.metadata.drop_all(engine)
+def drop_all():
+    Base.metadata.drop_all(engine)
 # drop_all()
 
 
